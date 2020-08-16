@@ -23,6 +23,7 @@ if torch.cuda.is_available():
 df = pd.read_csv('https://github.com/clairett/pytorch-sentiment-classification/raw/master/data/SST2/train.tsv', delimiter='\t', header=None)
 df = df[:4000]
 print(df[1].value_counts())
+print(df[1][1])
 
 
 model_class, tokenizer_class, pretrained_weights = (ppb.DistilBertModel, ppb.DistilBertTokenizer, 'distilbert-base-uncased')
@@ -35,6 +36,7 @@ model = model_class.from_pretrained(pretrained_weights)
 
 
 tokenized = df[0].apply((lambda x: tokenizer.encode(x, add_special_tokens=True)))
+print(tokenized[0])
 
 #add padding to test data 
 max_len = 0
