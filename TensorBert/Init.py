@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 import pandas as pd
 import numpy as np
-
+import requests
 import tensorflow as tf
 from tensorflow import keras
 
@@ -17,13 +17,14 @@ from bert.tokenization.bert_tokenization import FullTokenizer
 
 import seaborn as sns
 from pylab import rcParams
+import gdown
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from matplotlib import rc
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report
 from PartisanDetectionData import PartisanDetectionData
-
+from io import StringIO
 sns.set(style='whitegrid', palette='muted', font_scale=1.2)
 
 HAPPY_COLORS_PALETTE = ["#01BEFE", "#FFDD00", "#FF7D00", "#FF006D", "#ADFF02", "#8F00FF"]
@@ -39,7 +40,15 @@ tf.random.set_seed(RANDOM_SEED)
 
 
 def getInputData(filename):
-    return pd.read_json(filename)
+
+
+    url = filename
+
+    file_id = url.split('/')[-2]
+    dwn_url = 'https://drive.google.com/uc?export=download&id=' + file_id
+    url = requests.get(dwn_url).text
+    csv_raw = StringIO(url)
+    return pd.read_csv(csv_raw)
 
 
 def create_model(max_seq_len, bert_ckpt_file):
@@ -60,6 +69,7 @@ def create_model(max_seq_len, bert_ckpt_file):
     logits = keras.layers.Dropout(0.5)(logits)
     logits = keras.layers.Dense(units=len(classes), activation="softmax")(logits)
 
+
     model = keras.Model(inputs=input_ids, outputs=logits)
     model.build(input_shape=(None, max_seq_len))
 
@@ -67,7 +77,14 @@ def create_model(max_seq_len, bert_ckpt_file):
 
     return model
 
-data= getInputData('data.json')
+url= 'https://drive.google.com/file/d/1-QZJD10JTU0PyIfHtdWWfnnvbkeAyAEv/view?usp=sharing'
+data= getInputData(url)
+#data.to_csv('data.csv')
+print(data.head())
+
+strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5"])
+print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+
 train, test = train_test_split(data,test_size=0.1, shuffle=True)
 
 bert_model_name="uncased_L-12_H-768_A-12"
@@ -81,28 +98,22 @@ tokenizer = FullTokenizer(vocab_file=os.path.join(bert_ckpt_dir, "vocab.txt"))
 classes = train['hyperpartsan'].unique().tolist()
 
 data = PartisanDetectionData(train, test, tokenizer, classes, max_seq_len=512)
-
-model = create_model(data.max_seq_len, bert_ckpt_file)
-print(model.summary())
-
-
-model.compile(
-  optimizer=keras.optimizers.Adam(1e-5),
-  loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-  metrics=[keras.metrics.SparseCategoricalAccuracy(name="acc")]
-)
-
-log_dir = "log/partisan_detection/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%s")
-tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir)
+with strategy.scope():
+    model = create_model(data.max_seq_len, bert_ckpt_file)
+    print(model.summary())
+    model.compile(
+      optimizer=keras.optimizers.Adam(1e-5),
+      loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+      metrics=[keras.metrics.SparseCategoricalAccuracy(name="acc")]
+    )
 
 history = model.fit(
   x=data.train_x,
   y=data.train_y,
   validation_split=0.1,
-  batch_size=4,
+  batch_size=64,
   shuffle=True,
-  epochs=5,
-  callbacks=[tensorboard_callback]
+  epochs=5
 )
 
 _, train_acc = model.evaluate(data.train_x, data.train_y)
@@ -111,7 +122,5 @@ _, test_acc = model.evaluate(data.test_x, data.test_y)
 print("train acc", train_acc)
 print("test acc", test_acc)
 
-
-y_pred = model.predict(data.test_x).argmax(axis=-1)
-print(classification_report(data.test_y, y_pred, target_names=classes))
+print(classification_report(data.test_y.tolist(), y_pred, target_names=['0','1']))
 
