@@ -96,7 +96,7 @@ with strategy.scope():
     )
 model_dir= 'saved_models/'
 model_name = 'tensorflow.h5'
-if os.path.isfile(model_dir+model_name):
+if not os.path.isfile(model_dir+model_name):
     history = model.fit(
       x=data.train_x,
       y=data.train_y,
@@ -107,7 +107,7 @@ if os.path.isfile(model_dir+model_name):
     )
     model.save(model_dir+model_name)
 else:
-    model = load_model('part.h5', custom_objects={'BertModelLayer': BertModelLayer})
+    model = load_model(model_dir+model_name, custom_objects={'BertModelLayer': BertModelLayer})
 
 _, train_acc = model.evaluate(data.train_x, data.train_y)
 _, test_acc = model.evaluate(data.test_x, data.test_y)
