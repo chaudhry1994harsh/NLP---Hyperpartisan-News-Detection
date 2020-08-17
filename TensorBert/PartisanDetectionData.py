@@ -2,8 +2,8 @@ from bert.tokenization.bert_tokenization import FullTokenizer
 from tqdm import tqdm
 import numpy as np
 class PartisanDetectionData:
-    DATA_COLUMN = "truth"
-    LABEL_COLUMN = "hyperpartsan"
+    DATA_COLUMN = "content"
+    LABEL_COLUMN = "truth"
 
     def __init__(self, train, test, tokenizer: FullTokenizer, classes, max_seq_len=192):
         self.tokenizer = tokenizer
