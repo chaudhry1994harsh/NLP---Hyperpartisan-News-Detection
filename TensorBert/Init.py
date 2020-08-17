@@ -14,7 +14,7 @@ import bert
 from bert import BertModelLayer
 from bert.loader import StockBertConfig, map_stock_config_to_params, load_stock_weights
 from bert.tokenization.bert_tokenization import FullTokenizer
-
+from tensorflow.keras.models import load_model
 import seaborn as sns
 from pylab import rcParams
 import gdown
@@ -40,15 +40,7 @@ tf.random.set_seed(RANDOM_SEED)
 
 
 def getInputData(filename):
-
-
-    url = filename
-
-    file_id = url.split('/')[-2]
-    dwn_url = 'https://drive.google.com/uc?export=download&id=' + file_id
-    url = requests.get(dwn_url).text
-    csv_raw = StringIO(url)
-    return pd.read_csv(csv_raw)
+    return pd.read_csv(filename)
 
 
 def create_model(max_seq_len, bert_ckpt_file):
@@ -77,15 +69,11 @@ def create_model(max_seq_len, bert_ckpt_file):
 
     return model
 
-url= 'https://drive.google.com/file/d/1-QZJD10JTU0PyIfHtdWWfnnvbkeAyAEv/view?usp=sharing'
-data= getInputData(url)
-#data.to_csv('data.csv')
-print(data.head())
+train = getInputData('trainmain.csv')
+test = getInputData('testground.csv')
 
 strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5"])
 print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
-
-train, test = train_test_split(data,test_size=0.1, shuffle=True)
 
 bert_model_name="uncased_L-12_H-768_A-12"
 
@@ -95,7 +83,7 @@ bert_config_file = os.path.join(bert_ckpt_dir, "bert_config.json")
 
 tokenizer = FullTokenizer(vocab_file=os.path.join(bert_ckpt_dir, "vocab.txt"))
 
-classes = train['hyperpartsan'].unique().tolist()
+classes = train['truth'].unique().tolist()
 
 data = PartisanDetectionData(train, test, tokenizer, classes, max_seq_len=512)
 with strategy.scope():
@@ -106,21 +94,29 @@ with strategy.scope():
       loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
       metrics=[keras.metrics.SparseCategoricalAccuracy(name="acc")]
     )
-
-history = model.fit(
-  x=data.train_x,
-  y=data.train_y,
-  validation_split=0.1,
-  batch_size=64,
-  shuffle=True,
-  epochs=5
-)
+model_dir= 'saved_models/'
+model_name = 'tensorflow.h5'
+if os.path.isfile(model_dir+model_name):
+    history = model.fit(
+      x=data.train_x,
+      y=data.train_y,
+      validation_split=0.1,
+      batch_size=64,
+      shuffle=True,
+      epochs=5
+    )
+    model.save(model_dir+model_name)
+else:
+    model = load_model('part.h5', custom_objects={'BertModelLayer': BertModelLayer})
 
 _, train_acc = model.evaluate(data.train_x, data.train_y)
 _, test_acc = model.evaluate(data.test_x, data.test_y)
 
 print("train acc", train_acc)
 print("test acc", test_acc)
+y_pred = model.predict(data.test_x).argmax(axis=-1)
 
-print(classification_report(data.test_y.tolist(), y_pred, target_names=['0','1']))
+with open(model_dir+model_name.split()[0]+'.txt', 'w') as fh:
+    all_lines = fh.write(classification_report(data.test_y.tolist(), y_pred, target_names=['0','1']))
+
 
