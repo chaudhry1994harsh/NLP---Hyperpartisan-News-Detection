@@ -40,15 +40,7 @@ tf.random.set_seed(RANDOM_SEED)
 
 
 def getInputData(filename):
-
-
-    url = filename
-
-    file_id = url.split('/')[-2]
-    dwn_url = 'https://drive.google.com/uc?export=download&id=' + file_id
-    url = requests.get(dwn_url).text
-    csv_raw = StringIO(url)
-    return pd.read_csv(csv_raw)
+    return pd.read_csv(filename)
 
 
 def create_model(max_seq_len, bert_ckpt_file):
