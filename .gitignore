@@ -1,2 +1,9 @@
 articles-training-bypublisher.json
 articles-validation-bypublisher.json
+articles-training-byarticle.json
+articles-training-bypublisher.csv
+articles-validation-bypublisher.csv
+articles-training-byarticle.csv
+clnLARGE.json
+clnMID.json
+clnSMALL.json
