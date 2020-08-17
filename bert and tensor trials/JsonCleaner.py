@@ -29,6 +29,7 @@ for element in data:
     element.pop('publishedAt',None)
     #element.pop('_id',None)
     element.pop('title',None)
+    element.pop('content',None) #only for mid and large file i.e, both bypublisher files
 
 #print (data[1])
 #https://stackoverflow.com/questions/23306653/python-accessing-nested-json-data

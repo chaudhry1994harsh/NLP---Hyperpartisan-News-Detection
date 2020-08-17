@@ -10,7 +10,7 @@ import torch
 import transformers as ppb
 
 
-st = 'Clean Data Files\\clnSMALL.json'
+st = 'Data Files\\Clean files\\Json\\articles-validation-bypublisher.json'
 f = open(st,'r') 
 data = json.load(f) 
 f.close()
@@ -22,28 +22,15 @@ content = []
 ids = []
 #i = 0
 for elements in data:
-    truth.append(elements['hyperpartsan'])
+    truth.append(elements['truth'])
     content.append(elements['content'])
-    ids.append(elements['_id'])
-    '''x = elements['content']
-    damn = x.split()
-    if len(damn) > 510:
-        i = i +1
-        nue = ""
-        for jam in range(0,128):
-            nue = nue + " " + damn[jam]
-        for jam in range(len(damn)-382,len(damn)):
-            nue = nue + " " + damn[jam]
-        nue.strip()
-        content.append(nue)
-    else:
-        content.append(x)
-print("i: ",i)
-print(len(truth))
-print(len(content))'''
-df = pd.DataFrame({'content':content,'truth':truth})
+    ids.append(elements['id'])
+df = pd.DataFrame({'id':ids,'truth':truth,'content':content,})
 
+df.head()
 print(df['truth'].value_counts())
+df['truth']
+type(df)
 #print(df['truth'][4])
 #print(df['content'][4])
 
@@ -52,38 +39,6 @@ for x in df['content']:
     if(a<len(x.split())):
         a = len(x.split())
 print(a)
-
-'''cnt = 0
-lol = 0
-cnter = 0
-total = 0
-for x in df['content']:
-    damn = x.split()
-    cnt = cnt + len(damn)
-    if len(damn) > 510:
-        cnter = cnter + 1
-        nue = ""
-        for jam in range(0,128):
-            nue = nue + " " + damn[jam]
-        for jam in range(len(damn)-382,len(damn)):
-            nue = nue + " " + damn[jam]
-        nue.strip()
-        lol = lol + len(nue.split())
-        total = total + len(nue.split())
-        print(len(nue.split()))
-        df['content'].replace({x:nue},inplace=True)
-    else:
-        total = total + len(damn)
-
-print (cnt)
-cnt = cnt/645
-print (cnt)
-print(lol)
-print (lol/cnter)
-print(cnter)
-print(total/645)'''
-
-
 
 
 model_class, tokenizer_class, pretrained_weights = (ppb.DistilBertModel, ppb.DistilBertTokenizer, 'distilbert-base-uncased')
@@ -96,25 +51,82 @@ model = model_class.from_pretrained(pretrained_weights)
 
 tokenized = df['content'].apply((lambda x: tokenizer.encode(x, add_special_tokens=True)))
 
+tokenized
+print(tokenized[1])
+tokenized.head()
+type(tokenized)
+type(tokenized[1])
+#https://stackoverflow.com/questions/402504/how-to-determine-a-python-variables-type
+
+min=99999
+max=0
+avg=0
+for x in tokenized:
+    if(max<len(x)):
+        max = len(x)
+    if(min>len(x)):
+        min = len(x)
+    avg = avg + len(x)
+print("min: ",min)
+print("max: ",max)
+print("avg: ",(avg/len(tokenized)))
+
+#https://www.geeksforgeeks.org/python-truncate-a-list/
+#https://stackoverflow.com/questions/58636587/how-to-use-bert-for-long-text-classification
+#https://arxiv.org/pdf/1905.05583.pdf
+outofPLACE = []
+for x in range(645):
+    y = len(tokenized[x])
+    if(y>512):
+        outofPLACE.append(x)
+        start = tokenized[x][: 129]
+        #print("start sz:",len(start), " ", start[0])
+        end = tokenized[x][y-383 :]
+        #print("end sz:",len(end), " ", end[len(end)-1])
+        temp = start + end
+        #print("temp sz:", len(x), ", start:",x[0],", end:",x[len(x)-1] )
+        tokenized[x] = temp
+
+print("done")
+
+min=99999
+max=0
+avg=0
+for x in tokenized:
+    if(max<len(x)):
+        max = len(x)
+    if(min>len(x)):
+        min = len(x)
+    avg = avg + len(x)
+print("min: ",min)
+print("max: ",max)
+print("avg: ",(avg/len(tokenized)))
+
+#https://huggingface.co/transformers/main_classes/tokenizer.html
+#https://huggingface.co/transformers/preprocessing.html
+len(outofPLACE)
+outofPLACE[0]
+tokenized[outofPLACE[0]]
+tokenizer.decode(tokenized[outofPLACE[0]])
 
 
 
 
-
-f = open('Clean Data Files\\clnLARGE.json','r') 
+#test vales for bypublisher files
+'''
+#f = open('Data Files\\Clean files\\Json\\articles-validation-bypublisher.json','r') 
+#f = open('Data Files\\Clean files\\Json\\articles-training-bypublisher.json','r')
 data = json.load(f) 
 f.close()
 truth = []
 content = []
 ids = []
 for elements in data:
-    truth.append(elements['hyperpartsan'])
+    truth.append(elements['truth'])
     content.append(elements['content'])
-    ids.append(elements['_id'])
-df = pd.DataFrame({'id':ids,'content':content,'truth':truth})
-print(df['id'][15])
+    ids.append(elements['id'])
+df = pd.DataFrame({'id':ids,'truth':truth,'content':content})
 print(df['truth'].value_counts())
-print(df['content'][15])
-print(df.head())
+print(df.head())'''
 
 #https://arxiv.org/pdf/1905.05583.pdf
