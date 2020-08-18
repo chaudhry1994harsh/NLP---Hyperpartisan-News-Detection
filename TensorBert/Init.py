@@ -72,7 +72,7 @@ def create_model(max_seq_len, bert_ckpt_file):
 train = getInputData('trainmain_10000.csv')
 test = getInputData('testground_10000.csv')
 
-strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5"])
+strategy = tf.distribute.MirroredStrategy()
 print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
 bert_model_name="uncased_L-12_H-768_A-12"
