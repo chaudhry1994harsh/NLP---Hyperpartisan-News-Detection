@@ -69,8 +69,8 @@ def create_model(max_seq_len, bert_ckpt_file):
 
     return model
 
-train = getInputData('trainmain.csv')
-test = getInputData('testground.csv')
+train = getInputData('trainmain_10000.csv')
+test = getInputData('testground_10000.csv')
 
 strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5"])
 print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
@@ -95,12 +95,12 @@ with strategy.scope():
       metrics=[keras.metrics.SparseCategoricalAccuracy(name="acc")]
     )
 model_dir= 'saved_models/'
-model_name = 'tensorflow.h5'
+model_name = 'tensorflow_10000.h5'
 if not os.path.isfile(model_dir+model_name):
     history = model.fit(
       x=data.train_x,
       y=data.train_y,
-      validation_split=0.1,
+      validation_split=0.1, 
       batch_size=64,
       shuffle=True,
       epochs=5
