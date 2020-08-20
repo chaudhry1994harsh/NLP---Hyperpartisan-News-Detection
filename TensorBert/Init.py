@@ -43,7 +43,7 @@ def getInputData(filename):
     return pd.read_csv(filename)
 
 
-def create_model(max_seq_len, bert_ckpt_file):
+def create_model(max_seq_len, bert_ckpt_file,bert_config_file, classes):
     with tf.io.gfile.GFile(bert_config_file, "r") as reader:
         bc = StockBertConfig.from_json_string(reader.read())
         bert_params = map_stock_config_to_params(bc)
@@ -69,54 +69,57 @@ def create_model(max_seq_len, bert_ckpt_file):
 
     return model
 
-train = getInputData('trainmain_10000.csv')
-test = getInputData('testground_10000.csv')
+def run():
+    train = getInputData('trainmain_10000.csv')
+    test = getInputData('testground_10000.csv')
 
-strategy = tf.distribute.MirroredStrategy()
-print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+    strategy = tf.distribute.MirroredStrategy()
+    print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
-bert_model_name="uncased_L-12_H-768_A-12"
+    bert_model_name="uncased_L-12_H-768_A-12"
 
-bert_ckpt_dir = os.path.join("model/", bert_model_name)
-bert_ckpt_file = os.path.join(bert_ckpt_dir, "bert_model.ckpt")
-bert_config_file = os.path.join(bert_ckpt_dir, "bert_config.json")
+    bert_ckpt_dir = os.path.join("model/", bert_model_name)
+    bert_ckpt_file = os.path.join(bert_ckpt_dir, "bert_model.ckpt")
+    bert_config_file = os.path.join(bert_ckpt_dir, "bert_config.json")
 
-tokenizer = FullTokenizer(vocab_file=os.path.join(bert_ckpt_dir, "vocab.txt"))
+    tokenizer = FullTokenizer(vocab_file=os.path.join(bert_ckpt_dir, "vocab.txt"))
 
-classes = train['truth'].unique().tolist()
+    classes = train['truth'].unique().tolist()
 
-data = PartisanDetectionData(train, test, tokenizer, classes, max_seq_len=512)
-with strategy.scope():
-    model = create_model(data.max_seq_len, bert_ckpt_file)
-    print(model.summary())
-    model.compile(
-      optimizer=keras.optimizers.Adam(1e-5),
-      loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-      metrics=[keras.metrics.SparseCategoricalAccuracy(name="acc")]
-    )
-model_dir= 'saved_models/'
-model_name = 'tensorflow_10000.h5'
-if not os.path.isfile(model_dir+model_name):
-    history = model.fit(
-      x=data.train_x,
-      y=data.train_y,
-      validation_split=0.1, 
-      batch_size=64,
-      shuffle=True,
-      epochs=5
-    )
-    model.save(model_dir+model_name)
-else:
-    model = load_model(model_dir+model_name, custom_objects={'BertModelLayer': BertModelLayer})
+    data = PartisanDetectionData(train, test, tokenizer, classes, max_seq_len=512)
+    with strategy.scope():
+        model = create_model(data.max_seq_len, bert_ckpt_file,bert_config_file, classes)
+        print(model.summary())
+        model.compile(
+          optimizer=keras.optimizers.Adam(1e-5),
+          loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+          metrics=[keras.metrics.SparseCategoricalAccuracy(name="acc")]
+        )
+    model_dir= 'saved_models/'
+    model_name = 'tensorflow_10000.h5'
+    if not os.path.isfile(model_dir+model_name):
+        history = model.fit(
+          x=data.train_x,
+          y=data.train_y,
+          validation_split=0.1,
+          batch_size=64,
+          shuffle=True,
+          epochs=5
+        )
+        model.save(model_dir+model_name)
+    else:
+        model = load_model(model_dir+model_name, custom_objects={'BertModelLayer': BertModelLayer})
 
-_, train_acc = model.evaluate(data.train_x, data.train_y)
-_, test_acc = model.evaluate(data.test_x, data.test_y)
+    _, train_acc = model.evaluate(data.train_x, data.train_y)
+    _, test_acc = model.evaluate(data.test_x, data.test_y)
 
-print("train acc", train_acc)
-print("test acc", test_acc)
-y_pred = model.predict(data.test_x).argmax(axis=-1)
+    print("train acc", train_acc)
+    print("test acc", test_acc)
+    y_pred = model.predict(data.test_x).argmax(axis=-1)
 
-with open(model_dir+model_name.split()[0]+'.txt', 'w') as fh:
-    all_lines = fh.write(classification_report(data.test_y.tolist(), y_pred, target_names=['0','1']))
+    with open(model_dir+model_name.split()[0]+'.txt', 'w') as fh:
+        all_lines = fh.write(classification_report(data.test_y.tolist(), y_pred, target_names=['0','1']))
 
 
+if __name__ == '__main__':
+    run()
