@@ -1,5 +1,5 @@
 from tensorflow.keras.models import load_model
-from Init import BertModelLayer
+from bert import BertModelLayer
 import pandas as pd
 from bert.tokenization.bert_tokenization import FullTokenizer
 import os
