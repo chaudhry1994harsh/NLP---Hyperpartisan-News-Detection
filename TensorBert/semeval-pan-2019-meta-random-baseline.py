@@ -20,6 +20,7 @@ from tensorflow.keras.models import load_model
 from bert import BertModelLayer
 import numpy as np
 from bert.tokenization.bert_tokenization import FullTokenizer
+from bs4 import BeautifulSoup
 
 random.seed(42)
 runOutputFileName = "prediction.txt"
@@ -60,8 +61,15 @@ def parse_options():
 ########## MAIN ##########
 
 
-def predict(article):
+def clean(article):
+    soup = BeautifulSoup(txt, "html.parser")
+    text = soup.get_text()
+    text = text.strip()
+    return text
 
+
+def predict(article):
+    article = clean(article)
     tokenizer = FullTokenizer(vocab_file=("/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/vocab.txt"))
     print('Loading the model')
     model = load_model('/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/models/byarticle.h5', custom_objects={'BertModelLayer': BertModelLayer})
