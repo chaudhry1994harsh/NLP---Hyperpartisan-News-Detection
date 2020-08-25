@@ -94,7 +94,7 @@ def main(inputDataset, outputDir):
                     reader = csv.reader(inputRunFile, delimiter=' ')
                     for row in reader:
                         articleId = row[0]
-                        prediction = predict(row[1])
+                        prediction = predict(' '.join(row[1:]))
                         #prediction = random.choice(["true", "false"]) # random prediction
                         outFile.write(articleId + " " + prediction + "\n")
 
