@@ -62,7 +62,7 @@ def parse_options():
 
 
 def clean(article):
-    soup = BeautifulSoup(txt, "html.parser")
+    soup = BeautifulSoup(article, "html.parser")
     text = soup.get_text()
     text = text.strip()
     return text
