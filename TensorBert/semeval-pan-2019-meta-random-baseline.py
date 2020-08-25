@@ -64,7 +64,7 @@ def predict(article):
 
     tokenizer = FullTokenizer(vocab_file=("/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/vocab.txt"))
     print('Loading the model')
-    model = load_model('/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/model/byarticle.h5', custom_objects={'BertModelLayer': BertModelLayer})
+    model = load_model('/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/models/byarticle.h5', custom_objects={'BertModelLayer': BertModelLayer})
 
     pred_tokens = tokenizer.tokenize(article)
     pred_tokens = ["[CLS]"] + pred_tokens + ["[SEP]"]
