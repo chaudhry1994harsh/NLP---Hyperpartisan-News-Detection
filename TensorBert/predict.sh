@@ -5,8 +5,10 @@ echo "Starting the prediction"
 INPUTDIR=${1?Error no input given}
 OUTDIR=${2?Error no output given}
 
-#echo "/home/zenith-kaju/miniconda3/condabin/conda init bash"
-#/home/zenith-kaju/miniconda3/condabin/conda init bash
+echo "/home/zenith-kaju/miniconda3/condabin/conda init bash"
+/home/zenith-kaju/miniconda3/condabin/conda init bash
+
+source /home/zenith-kaju/.bashrc
 
 echo "/home/zenith-kaju/miniconda3/condabin/conda activate projenv"
 /home/zenith-kaju/miniconda3/condabin/conda activate projenv
