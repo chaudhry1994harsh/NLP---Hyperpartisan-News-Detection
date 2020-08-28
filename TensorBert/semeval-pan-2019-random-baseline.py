@@ -67,11 +67,8 @@ def clean(article):
     return text
 
 
-def predict(article):
+def predict(article,tokenizer, model):
     article = clean(article)
-    tokenizer = FullTokenizer(vocab_file=("/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/vocab.txt"))
-    print('Loading the model')
-    model = load_model('/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/models/byarticle.h5', custom_objects={'BertModelLayer': BertModelLayer})
 
     pred_tokens = tokenizer.tokenize(article)
     pred_tokens = ["[CLS]"] + pred_tokens + ["[SEP]"]
@@ -83,9 +80,7 @@ def predict(article):
         pred_token_ids = pred_token_ids + [0] * (512 - len(pred_token_ids))
 
     pred_token_ids = [pred_token_ids]
-
     pred_token_ids = np.array(pred_token_ids)
-
     predictions = model.predict(pred_token_ids).argmax(axis=-1)
     pred = 'true' if predictions[0] else 'false'
     return pred
@@ -102,7 +97,11 @@ def element_to_string(element):
 
 def main(inputDataset, outputDir):
     """Main method of this module."""
-
+    print('--------------loading model----------------------')
+    tokenizer = FullTokenizer(vocab_file=("/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/vocab.txt"))
+    model = load_model('/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/models/byarticle.h5',
+                       custom_objects={'BertModelLayer': BertModelLayer})
+    print('------------------Model Loaded---------------------')
     with open(outputDir + "/" + runOutputFileName, 'w') as outFile:
         for file in os.listdir(inputDataset):
             if file.endswith(".xml"):
@@ -111,10 +110,8 @@ def main(inputDataset, outputDir):
                 for article in root.iter('article'):
                     articleID = article.attrib['id']
                     content = element_to_string(article)
-                    print(articleID, '11111', content)
-                    prediction = predict(content)
+                    prediction = predict(content,tokenizer, model)
                     outFile.write(articleID + " " + prediction + "\n")
-
 
     print("The predictions have been written to the output folder.")
 
