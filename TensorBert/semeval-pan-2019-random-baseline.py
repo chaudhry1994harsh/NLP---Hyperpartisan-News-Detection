@@ -14,7 +14,7 @@ from __future__ import division
 import os
 import getopt
 import sys
-import xml.sax
+from xml.etree import ElementTree
 import random
 from tensorflow.keras.models import load_model
 from bert import BertModelLayer
@@ -90,23 +90,12 @@ def predict(article):
     pred = 'true' if predictions[0] else 'false'
     return pred
 
-class HyperpartisanNewsRandomPredictor(xml.sax.ContentHandler):
-    def __init__(self, outFile):
-        xml.sax.ContentHandler.__init__(self)
-        self.outFile = outFile
-
-    def startElement(self, name, attrs):
-        if name == "article":
-            articleId = attrs.getValue("id") # id of the article for which hyperpartisanship should be predicted
-            content = attrs.getValue("content")
-            prediction = predict(content)
-            #prediction = random.choice(["true", "false"]) # random prediction
-            #confidence = random.random() # random confidence value for prediction
-            # output format per line: "<article id> <prediction>[ <confidence>]"
-            #   - prediction is either "true" (hyperpartisan) or "false" (not hyperpartisan)
-            #   - confidence is an optional value to describe the confidence of the predictor in the prediction---the higher, the more confident
-            self.outFile.write(articleId + " " + prediction+ "\n")
-
+def element_to_string(element):
+    s = element.text or ""
+    for sub_element in element:
+        s += ElementTree.tostring(sub_element, encoding='unicode')
+    s += element.tail
+    return s
 
 ########## MAIN ##########
 
@@ -117,8 +106,14 @@ def main(inputDataset, outputDir):
     with open(outputDir + "/" + runOutputFileName, 'w') as outFile:
         for file in os.listdir(inputDataset):
             if file.endswith(".xml"):
-                with open(inputDataset + "/" + file) as inputRunFile:
-                    xml.sax.parse(inputRunFile, HyperpartisanNewsRandomPredictor(outFile))
+                tree = ElementTree.parse(file)
+                root = tree.getroot()
+                for article in root.iter('article'):
+                    articleID = article.attrib['id']
+                    content = element_to_string(article)
+                    print(articleID, '11111', content)
+                    prediction = predict(content)
+                    outFile.write(articleID + " " + prediction + "\n")
 
 
     print("The predictions have been written to the output folder.")
