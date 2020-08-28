@@ -106,7 +106,7 @@ def main(inputDataset, outputDir):
     with open(outputDir + "/" + runOutputFileName, 'w') as outFile:
         for file in os.listdir(inputDataset):
             if file.endswith(".xml"):
-                tree = ElementTree.parse(file)
+                tree = ElementTree.parse(inputDataset+ "/" +file)
                 root = tree.getroot()
                 for article in root.iter('article'):
                     articleID = article.attrib['id']
