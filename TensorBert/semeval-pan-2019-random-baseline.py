@@ -21,7 +21,7 @@ from bert import BertModelLayer
 import numpy as np
 from bert.tokenization.bert_tokenization import FullTokenizer
 from bs4 import BeautifulSoup
-
+from tqdm import tqdm
 random.seed(42)
 runOutputFileName = "prediction.txt"
 
@@ -107,7 +107,8 @@ def main(inputDataset, outputDir):
             if file.endswith(".xml"):
                 tree = ElementTree.parse(inputDataset+ "/" +file)
                 root = tree.getroot()
-                for article in root.iter('article'):
+                print('Total articles ', len(root))
+                for article in tqdm(root.iter('article')):
                     articleID = article.attrib['id']
                     content = element_to_string(article)
                     prediction = predict(content,tokenizer, model)
