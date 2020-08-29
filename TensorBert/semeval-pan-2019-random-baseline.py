@@ -29,20 +29,23 @@ runOutputFileName = "prediction.txt"
 def parse_options():
     """Parses the command line options."""
     try:
-        long_options = ["inputDataset=", "outputDir="]
-        opts, _ = getopt.getopt(sys.argv[1:], "d:o:", long_options)
+        long_options = ["inputDataset=", "outputDir=", "modelType="]
+        opts, _ = getopt.getopt(sys.argv[1:], "d:o:m", long_options)
     except getopt.GetoptError as err:
         print(str(err))
         sys.exit(2)
 
     inputDataset = "undefined"
     outputDir = "undefined"
+    modelType = "undefined"
 
     for opt, arg in opts:
         if opt in ("-d", "--inputDataset"):
             inputDataset = arg
         elif opt in ("-o", "--outputDir"):
             outputDir = arg
+        elif opt in ("-m", "--modelType"):
+            modelType = arg
         else:
             assert False, "Unknown option."
     if inputDataset == "undefined":
@@ -55,7 +58,18 @@ def parse_options():
     elif not os.path.exists(outputDir):
         os.mkdir(outputDir)
 
-    return (inputDataset, outputDir)
+    if modelType == "undefined":
+        sys.exit("modeltype is undefined. Use option -m or --modelType.")
+    elif modelType == "1":
+        modelType = 'byarticle.h5'
+    elif modelType == "2":
+        modelType = 'bertFull_10000.h5' # by publisher full 768 bert model
+    elif modelType == "3":
+        modelType = 'tinybert300000.h5' # by publisher on tiny bert
+    else :
+        sys.exit("modeltype is undefined. Use option -m or --modelType.")
+
+    return (inputDataset, outputDir, modelType)
 
 
 ########## SAX ##########
@@ -95,11 +109,12 @@ def element_to_string(element):
 ########## MAIN ##########
 
 
-def main(inputDataset, outputDir):
+def main(inputDataset, outputDir, modelType):
+    print(inputDataset, outputDir, 'modelType : ',modelType)
     """Main method of this module."""
     print('--------------loading model----------------------')
     tokenizer = FullTokenizer(vocab_file=("/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/vocab.txt"))
-    model = load_model('/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/models/byarticle.h5',
+    model = load_model('/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/models/'+modelType,
                        custom_objects={'BertModelLayer': BertModelLayer})
     print('------------------Model Loaded---------------------')
     with open(outputDir + "/" + runOutputFileName, 'w') as outFile:
