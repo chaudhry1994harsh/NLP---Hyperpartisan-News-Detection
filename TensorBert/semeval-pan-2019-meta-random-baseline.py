@@ -88,7 +88,7 @@ def predict(article):
     pred_token_ids = np.array(pred_token_ids)
 
     predictions = model.predict(pred_token_ids).argmax(axis=-1)
-    pred = 'true' if predictions[0] else 'false'
+    pred = 'false' if predictions[0] else 'true'
     return pred
 
 
