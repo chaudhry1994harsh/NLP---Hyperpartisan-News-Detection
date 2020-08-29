@@ -115,16 +115,15 @@ def main(inputDataset, outputDir, modelType):
     print(inputDataset, outputDir, 'modelType : ',modelType)
     """Main method of this module."""
     print('--------------loading model----------------------')#
-    DIR='/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/modelHar/'
-    tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
+    DIR='/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/modelHar/acc/'
+    tokenizer = DistilBertTokenizer.from_pretrained(DIR+'bert-base-uncased-vocab.txt')
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.000001)
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-    model = TFDistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased')
+    model = TFDistilBertForSequenceClassification.from_pretrained(DIR)
 
     model.compile(optimizer=optimizer, loss=loss,
                                 metrics=[keras.metrics.SparseCategoricalAccuracy(name="acc")])
 
-    model.load_weights(DIR + modelType)
     print('------------------Model Loaded---------------------')
     with open(outputDir + "/" + runOutputFileName, 'w') as outFile:
         for file in os.listdir(inputDataset):
