@@ -96,7 +96,7 @@ def predict(article,tokenizer, model):
     pred_token_ids = [pred_token_ids]
     pred_token_ids = np.array(pred_token_ids)
     predictions = model.predict(pred_token_ids).argmax(axis=-1)
-    pred = 'true' if predictions[0] else 'false'
+    pred = 'false' if predictions[0] else 'true'
     return pred
 
 def element_to_string(element):
