@@ -61,13 +61,13 @@ def parse_options():
     if modelType == "undefined":
         sys.exit("modeltype is undefined. Use option -m or --modelType.")
     elif modelType == "1":
-        modelType = 'MIDbestLoss_byPublisher_model.h5'
+        modelType = 'acc'
     elif modelType == "2":
-        modelType = 'MIDbestAcc_byPublisher_model.h5' #
+        modelType = 'loss' #
     elif modelType == "3":
-        modelType = 'bestAcc_byArticle_model.h5' #
+        modelType = 'accpub' #
     elif modelType == "4":
-        modelType = 'bestLoss_byArticle_model.h5' #
+        modelType = 'losspub' #
     else :
         sys.exit("modeltype is undefined. Use option -m or --modelType.")
 
@@ -115,11 +115,14 @@ def main(inputDataset, outputDir, modelType):
     print(inputDataset, outputDir, 'modelType : ',modelType)
     """Main method of this module."""
     print('--------------loading model----------------------')#
-    DIR='/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/modelHar/acc/'
+    DIR='/home/zenith-kaju/NLP---Hyperpartisan-News-Detection/TensorBert/modelHar/'
+    print('DIR : ',DIR)
     tokenizer = DistilBertTokenizer.from_pretrained(DIR+'bert-base-uncased-vocab.txt')
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.000001)
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-    model = TFDistilBertForSequenceClassification.from_pretrained(DIR)
+    modelpath = DIR + modelType
+    print('modelpath : ', modelpath)
+    model = TFDistilBertForSequenceClassification.from_pretrained(modelpath)
 
     model.compile(optimizer=optimizer, loss=loss,
                                 metrics=[keras.metrics.SparseCategoricalAccuracy(name="acc")])
