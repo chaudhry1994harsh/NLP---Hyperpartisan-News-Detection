@@ -1,3 +1,19 @@
+"""
+Utility file to get prediction on a test dataset. It loads a pretrained
+model and make predictions on the input examples. It then store the
+results in text file.
+
+BERT
+https://github.com/google-research/bert
+
+BERT for Tensorflow
+https://github.com/kpe/bert-for-tf2
+https://www.curiousily.com/posts/intent-recognition-with-bert-using-keras-and-tensorflow-2/
+https://www.tensorflow.org/guide/keras/save_and_serialize
+https://machinelearningspace.com/sentiment-analysis-tensorflow/
+https://keras.io/api/models/model/
+"""
+
 from tensorflow.keras.models import load_model
 from bert import BertModelLayer
 import pandas as pd

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-"""Random baseline for the PAN19 hyperpartisan news detection task"""
-# Version: 2018-09-24
+""" PAN19 hyperpartisan news detection task"""
 
 # Parameters:
 # --inputDataset=<directory>
 #   Directory that contains the articles XML file with the articles for which a prediction should be made.
 # --outputDir=<directory>
 #   Directory to which the predictions will be written. Will be created if it does not exist.
+#  Code adapted from https://github.com/pan-webis-de/pan-code/tree/master/semeval19
 
 from __future__ import division
 
@@ -23,7 +23,7 @@ from bert.tokenization.bert_tokenization import FullTokenizer
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 random.seed(42)
-runOutputFileName = "prediction.txt"
+runOutputFileName = "prediction.txt" # output file
 
 
 def parse_options():
@@ -75,13 +75,16 @@ def parse_options():
 ########## SAX ##########
 
 def clean(article):
+    """Function to clean the article content of HTML tags."""
     soup = BeautifulSoup(article, "html.parser")
     text = soup.get_text()
     text = text.strip()
     return text
 
-
 def predict(article,tokenizer, model):
+    """
+    Utility function to predict a single article with the model and tokenizer
+    """
     article = clean(article)
 
     pred_tokens = tokenizer.tokenize(article)
@@ -107,8 +110,11 @@ def element_to_string(element):
     return s
 
 ########## MAIN ##########
-
-
+#Main function to get the test file in XML format and parse it to predict
+# the content of article as hyperpartisan or not.
+# A pre-trained keras model is loaded from the memory to get the predictions.
+# https://docs.python.org/3/library/xml.etree.elementtree.html
+# https://www.curiousily.com/posts/intent-recognition-with-bert-using-keras-and-tensorflow-2/
 def main(inputDataset, outputDir, modelType):
     print(inputDataset, outputDir, 'modelType : ',modelType)
     """Main method of this module."""
