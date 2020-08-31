@@ -1,6 +1,6 @@
 # SemEval 2019 Hyperpartisan-News-Detection
 
-Task: Given a news article text, decide whether it follows a hyperpartisan argumentation, i.e., whether it exhibits blind, prejudiced, or unreasoning allegiance to one party, faction, cause, or person.
+[Task]: Given a news article text, decide whether it follows a hyperpartisan argumentation, i.e., whether it exhibits blind, prejudiced, or unreasoning allegiance to one party, faction, cause, or person.
 
 ## Dataset
 2 datasets were provided:
@@ -9,7 +9,7 @@ Task: Given a news article text, decide whether it follows a hyperpartisan argum
   
 ## Training
 Primarily BERT language model was used to make classifiers.
-In 'Tensorbert' folder, tensorflow was used to make corresponding BERT layer in  the model but in 'distilBERT TF2' folder pytorch transformer's BERT layer was used. 
+In [Tensorbert] folder, tensorflow was used to make corresponding BERT layer in  the model but in [distilBERT TF2] folder pytorch transformer's BERT layer was used. 
 
 ## Evaluation
 THe models were evaluated on TIRA platform. The test sets were not available directly and could only be tested via TIRA.
@@ -27,3 +27,11 @@ THe models were evaluated on TIRA platform. The test sets were not available dir
 | ------ | ------ | ------ | ------ |
 |Distilbert Loss | 0.521 | 0.561 | 0.193 | 0.287 |
 |Tiny bert | 0.646 | 0.610 | 0.804 | 0.694 |
+
+
+
+
+
+[Task]: <https://pan.webis.de/semeval19/semeval19-web/>
+[Tensorbert]: <https://github.com/chaudhry1994harsh/NLP---Hyperpartisan-News-Detection/tree/master/TensorBert>
+[distilBERT TF2]: <https://github.com/chaudhry1994harsh/NLP---Hyperpartisan-News-Detection/tree/master/distilBERT%20TF2>
