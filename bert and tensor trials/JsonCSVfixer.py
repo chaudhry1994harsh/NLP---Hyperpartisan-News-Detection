@@ -7,8 +7,8 @@ from bs4 import BeautifulSoup
 #small file
 def byArticle():
     st = 'Data Files\\formatted Json\\articles-training-byarticle.json'
-    targJSON = 'Data Files\\Clean files\\Json\\articles-training-byarticle.json'
-    targCSV = 'Data Files\\Clean files\\CSV\\articles-training-byarticle.csv'
+    targJSON = 'Data Files\\Clean files\\Json\\TITLEarticles-training-byarticle.json'
+    targCSV = 'Data Files\\Clean files\\CSV\\TITLEarticles-training-byarticle.csv'
     f = open(st,'r') 
     data = json.load(f) 
     f.close()
@@ -19,7 +19,8 @@ def byArticle():
     #https://stackoverflow.com/questions/16206380/python-beautifulsoup-how-to-remove-all-tags-from-an-element
     for element in data:
         ids.append(element['_id'])
-        soup = BeautifulSoup(element['content'],"html.parser")
+        soup = BeautifulSoup(element['title'],"html.parser")
+        #soup = BeautifulSoup(element['content'],"html.parser")
         text = soup.get_text()
         text = text.strip()
         content.append(text)
@@ -28,7 +29,8 @@ def byArticle():
         else:
             hyperpartsan.append(0)
 
-    df = pd.DataFrame({'id':ids,'truth':hyperpartsan,'content':content})
+    #df = pd.DataFrame({'id':ids,'truth':hyperpartsan,'content':content})
+    df = pd.DataFrame({'id':ids,'truth':hyperpartsan,'title':content})
 
     #https://stackoverflow.com/questions/43413119/forward-slash-in-json-file-from-pandas-dataframe
     json_records = df.to_json(orient ='records') 
@@ -44,12 +46,12 @@ def byArticle():
 def byPublisher(strng):
     if strng == 'validation':
         st = 'Data Files\\formatted Json\\articles-validation-bypublisher.json'
-        targJSON = 'Data Files\\Clean files\\Json\\articles-validation-bypublisher.json'
-        targCSV = 'Data Files\\Clean files\\CSV\\articles-validation-bypublisher.csv'
+        targJSON = 'Data Files\\Clean files\\Json\\TITLEarticles-validation-bypublisher.json'
+        targCSV = 'Data Files\\Clean files\\CSV\\TITLEarticles-validation-bypublisher.csv'
     elif strng == 'training':
         st = 'Data Files\\formatted Json\\articles-training-bypublisher.json'
-        targJSON = 'Data Files\\Clean files\\Json\\articles-training-bypublisher.json'
-        targCSV = 'Data Files\\Clean files\\CSV\\articles-training-bypublisher.csv'
+        targJSON = 'Data Files\\Clean files\\Json\\TITLEarticles-training-bypublisher.json'
+        targCSV = 'Data Files\\Clean files\\CSV\\TITLEarticles-training-bypublisher.csv'
 
     f = open(st,'r') 
     data = json.load(f) 
@@ -61,7 +63,8 @@ def byPublisher(strng):
     #https://stackoverflow.com/questions/16206380/python-beautifulsoup-how-to-remove-all-tags-from-an-element
     for element in data:
         ids.append(element['_id'])
-        soup = BeautifulSoup(element['bias'],"html.parser")
+        #soup = BeautifulSoup(element['bias'],"html.parser")
+        soup = BeautifulSoup(element['content'],"html.parser")
         text = soup.get_text()
         text = text.strip()
         content.append(text)
@@ -70,7 +73,8 @@ def byPublisher(strng):
         else:
             hyperpartsan.append(0)
 
-    df = pd.DataFrame({'id':ids,'truth':hyperpartsan,'content':content})
+    #df = pd.DataFrame({'id':ids,'truth':hyperpartsan,'content':content})
+    df = pd.DataFrame({'id':ids,'truth':hyperpartsan,'title':content})
 
     #https://stackoverflow.com/questions/43413119/forward-slash-in-json-file-from-pandas-dataframe
     json_records = df.to_json(orient ='records') 
@@ -86,3 +90,11 @@ def byPublisher(strng):
 byArticle()
 byPublisher('validation')
 byPublisher('training')
+
+
+'''text cleaner'''
+def textCLEANER(txt):
+    soup = BeautifulSoup(txt,"html.parser")
+    text = soup.get_text()
+    text = text.strip()
+    return text

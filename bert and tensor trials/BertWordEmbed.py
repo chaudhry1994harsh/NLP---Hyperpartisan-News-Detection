@@ -75,7 +75,7 @@ print("avg: ",(avg/len(tokenized)))
 #https://stackoverflow.com/questions/58636587/how-to-use-bert-for-long-text-classification
 #https://arxiv.org/pdf/1905.05583.pdf
 outofPLACE = []
-for x in range(645):
+for x in range(len(tokenized)):
     y = len(tokenized[x])
     if(y>512):
         outofPLACE.append(x)
