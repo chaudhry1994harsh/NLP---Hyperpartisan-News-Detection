@@ -15,15 +15,15 @@ In [Tensorbert] folder, tensorflow was used to make corresponding BERT layer in 
 THe models were evaluated on TIRA platform. The test sets were not available directly and could only be tested via TIRA.
 
 ### Results on 'By Article' dataset
-| Model|Accuracy | Precision | Recall | F-score |
-| ------ | ------ | ------ | ------ |
+| Model |Accuracy | Precision | Recall | F-score |
+| ------ | ------ | ------ | ------ | ------ |
 | DistilBert-base acc | 0.718 | 0.920 | 0.477 | 0.628 |
 |Bert-base | .590  | 0.551 | 0.974 | 0.704 |
 |DistilBert-base loss | 0.724  | 0.917 | 0.493 | 0.641 |
 
 ### Results on 'By Publisher' dataset
-| Model|Accuracy | Precision | Recall | F-score |
-| ------ | ------ | ------ | ------ |
+| Model |Accuracy | Precision | Recall | F-score |
+| ------ | ------ | ------ | ------ | ------ |
 |DistilBert-base  | 0.521 | 0.561 | 0.193 | 0.287 |
 |Tiny bert | 0.646 | 0.610 | 0.804 | 0.694 |
 
