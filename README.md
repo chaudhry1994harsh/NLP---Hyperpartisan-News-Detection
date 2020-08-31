@@ -17,15 +17,14 @@ THe models were evaluated on TIRA platform. The test sets were not available dir
 ### Results on 'By Article' dataset
 | Accuracy | Precision | Recall | F-score |
 | ------ | ------ | ------ | ------ |
-| Base | 0.299  | 0.366 | 0.550 | 0.440 |
-|Distilbert acc | 0.718 | 0.920 | 0.477 | 0.628 |
-|Base | .590  | 0.551 | 0.974 | 0.704 |
-|Distilbert loss | 0.724  | 0.917 | 0.493 | 0.641 |
+| DistilBert-base acc | 0.718 | 0.920 | 0.477 | 0.628 |
+|Bert-base | .590  | 0.551 | 0.974 | 0.704 |
+|DistilBert-base loss | 0.724  | 0.917 | 0.493 | 0.641 |
 
 ### Results on 'By Publisher' dataset
 | Accuracy | Precision | Recall | F-score |
 | ------ | ------ | ------ | ------ |
-|Distilbert Loss | 0.521 | 0.561 | 0.193 | 0.287 |
+|DistilBert-base  | 0.521 | 0.561 | 0.193 | 0.287 |
 |Tiny bert | 0.646 | 0.610 | 0.804 | 0.694 |
 
 
