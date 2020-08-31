@@ -1,3 +1,17 @@
+"""
+Class to encapsulate the input data in an object. It has added functionality
+of convert input text to bert tensors.
+
+Bert Tensors creation steps:
+-Tokenize the text
+-Convert the sequence of tokens into numbers
+-Pad the sequences so each one has the same length
+
+The maxlength of the text is 512 tokens.
+
+
+"""
+
 from bert.tokenization.bert_tokenization import FullTokenizer
 from tqdm import tqdm
 import numpy as np
@@ -5,7 +19,7 @@ class PartisanDetectionData:
     DATA_COLUMN = "content"
     LABEL_COLUMN = "truth"
 
-    def __init__(self, train, test, tokenizer: FullTokenizer, classes, max_seq_len=192):
+    def __init__(self, train, test, tokenizer: FullTokenizer, classes, max_seq_len=512):
         self.tokenizer = tokenizer
         self.max_seq_len = 0
         self.classes = classes
@@ -21,9 +35,9 @@ class PartisanDetectionData:
 
         for _, row in tqdm(df.iterrows()):
             text, label = row[PartisanDetectionData.DATA_COLUMN], row[PartisanDetectionData.LABEL_COLUMN]
-            tokens = self.tokenizer.tokenize(text)
+            tokens = self.tokenizer.tokenize(text) # tokenisation
             tokens = ["[CLS]"] + tokens + ["[SEP]"]
-            token_ids = self.tokenizer.convert_tokens_to_ids(tokens)
+            token_ids = self.tokenizer.convert_tokens_to_ids(tokens) #Convert the sequence of tokens into numbers
             self.max_seq_len = max(self.max_seq_len, len(token_ids))
             x.append(token_ids)
             y.append(self.classes.index(label))
