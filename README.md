@@ -9,7 +9,7 @@ Task: Given a news article text, decide whether it follows a hyperpartisan argum
   
 ## Training
 Primarily BERT language model was used to make classifiers.
-In Tensorbert folder, tensorflow was used to make corresponding BERT layer in  the model but in +++ folder pytorch transformer's BERT layer was used. 
+In 'Tensorbert' folder, tensorflow was used to make corresponding BERT layer in  the model but in 'distilBERT TF2' folder pytorch transformer's BERT layer was used. 
 
 ## Evaluation
 THe models were evaluated on TIRA platform. The test sets were not available directly and could only be tested via TIRA.
